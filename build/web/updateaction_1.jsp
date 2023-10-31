@@ -1,0 +1,126 @@
+<%--@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ page import="java.sql.Connection" %>
+<%@ page import="java.sql.DriverManager" %>
+<%@ page import="java.sql.PreparedStatement" %>
+<%@ page import="java.sql.SQLException" %>
+
+<%
+    Connection con = null;
+    PreparedStatement ps = null;
+
+    try {
+        String url = "jdbc:mysql://localhost:3306/fvms";
+        String username = "root";
+        String dbpassword = "Durga@123";
+        Class.forName("com.mysql.jdbc.Driver");
+        con = DriverManager.getConnection(url, username, dbpassword);
+
+        // Get the leave ID and action values from the request parameters
+        int id = Integer.parseInt(request.getParameter("id"));
+        String action = request.getParameter("action");
+
+        // Update the action in the database based on the ID
+        String updateQuery = "UPDATE elections SET action = ? WHERE id = ?";
+        ps = con.prepareStatement(updateQuery);
+        ps.setString(1, action);
+        ps.setInt(2, id);
+        ps.executeUpdate();
+        
+        
+        
+        
+       /*  // Set session attributes for the alert message and type
+        String alertMessage = "Leave request has been " + action.toLowerCase() + "!";
+        String alertType = (action.equals("Accepted")) ? "success" : "error";
+        request.getSession().setAttribute("alertMessage", alertMessage);
+        request.getSession().setAttribute("alertType", alertType);
+        
+        
+        */
+        
+        
+        
+        
+
+        // Redirect back to the original page
+        response.sendRedirect("admin-manage-election.jsp");
+    } catch (SQLException e) {
+        e.printStackTrace();
+        // Handle the SQL exception
+    } catch (ClassNotFoundException e) {
+        e.printStackTrace();
+        // Handle the class not found exception
+    } finally {
+        // Close the JDBC objects
+        try {
+            if (ps != null) {
+                ps.close();
+            }
+            if (con != null) {
+                con.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+--%>
+
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ page import="java.sql.Connection" %>
+<%@ page import="java.sql.DriverManager" %>
+<%@ page import="java.sql.PreparedStatement" %>
+<%@ page import="java.sql.SQLException" %>
+
+<%
+    Connection con = null;
+    PreparedStatement ps = null;
+
+    try {
+        String url = "jdbc:mysql://localhost:3306/fvms";
+        String username = "root";
+        String dbpassword = "Durga@123";
+        Class.forName("com.mysql.jdbc.Driver");
+        con = DriverManager.getConnection(url, username, dbpassword);
+
+        // Get the election ID and action values from the request parameters
+        int id = Integer.parseInt(request.getParameter("id"));
+        String action = request.getParameter("action");
+
+        // Update the action in the database based on the ID
+     String updateQuery = "UPDATE elections SET action = ?, results = ? WHERE id = ?";
+        ps = con.prepareStatement(updateQuery);
+
+        if (action.equals("Ongoing")) {
+            ps.setString(1, "Ongoing");
+            ps.setString(2, "Pending"); // Set results to "Pending" if action is "Ongoing"
+        } else if (action.equals("Closed")) {
+            ps.setString(1, "Closed");
+            ps.setString(2, "Declared"); // Set results to "Declared" if action is "Closed"
+        }
+
+        ps.setInt(3, id);
+        ps.executeUpdate();
+
+        // Redirect back to the original page
+        response.sendRedirect("admin-manage-election.jsp");
+    } catch (SQLException e) {
+        e.printStackTrace();
+        // Handle the SQL exception
+    } catch (ClassNotFoundException e) {
+        e.printStackTrace();
+        // Handle the class not found exception
+    } finally {
+        // Close the JDBC objects
+        try {
+            if (ps != null) {
+                ps.close();
+            }
+            if (con != null) {
+                con.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+%>
+
